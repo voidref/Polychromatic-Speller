@@ -46,7 +46,12 @@ static IMP originalColorAtCharacterIndexImplementation;
 
     if ([item ply_isIdentifier] && ![[DVTSourceNodeTypes nodeTypeNameForId:item.parent.nodeType] isEqualToString:@"xcode.syntax.name.partial"] && workspaceIndex)
     {
-        color = [[PLYVariableManager sharedManager] colorForVariable:string inWorkspace:workspace];
+        // Literally have no idea what this is or why it's a dictionary; but, it does prevent the flash of color vomit from appearing when first opening projects.
+        NSDictionary *indexState = [workspaceIndex indexState];
+        if ([indexState count] > 0)
+        {
+            color = [[PLYVariableManager sharedManager] colorForVariable:string inWorkspace:workspace];
+        }
     }
 
     return color;
