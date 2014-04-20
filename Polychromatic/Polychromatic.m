@@ -12,8 +12,6 @@
 
 @property (nonatomic, strong) NSBundle *bundle;
 
-@property (nonatomic, strong) NSMenuItem *enableItem;
-
 @end
 
 @implementation Polychromatic
@@ -97,14 +95,6 @@
     }
 }
 
-- (void)toggleEnabled:(id)sender
-{
-    BOOL newValue = ![[NSUserDefaults standardUserDefaults] boolForKey:@"PLYPluginEnabled"];
-    [[NSUserDefaults standardUserDefaults] setBool:newValue forKey:@"PLYPluginEnabled"];
-
-    [self.enableItem setState:newValue ? NSOnState : NSOffState];
-}
-
 - (void)modifyEditorMenu:(id)sender
 {
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -123,26 +113,10 @@
         installItem.target = self;
         [polychromaticMenu addItem:installItem];
 
-        self.enableItem = [[NSMenuItem alloc] initWithTitle:@"Enabled" action:@selector(toggleEnabled:) keyEquivalent:@"E"];
-
-        if ([[NSUserDefaults standardUserDefaults] boolForKey:@"PLYPluginEnabled"])
-        {
-            [self.enableItem setState:NSOnState];
-        }
-
-        self.enableItem.target = self;
-        [polychromaticMenu addItem:self.enableItem];
-
-
         menuItem.submenu = polychromaticMenu;
         [editorMenuItem.submenu addItem:[NSMenuItem separatorItem]];
         [editorMenuItem.submenu addItem:menuItem];
     });
-}
-
-- (BOOL)pluginEnabled
-{
-    return [[NSUserDefaults standardUserDefaults] boolForKey:@"PLYPluginEnabled"];
 }
 
 - (BOOL)validateMenuItem:(NSMenuItem *)menuItem
