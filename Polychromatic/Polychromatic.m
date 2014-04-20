@@ -104,6 +104,29 @@
 
 #pragma mark - (A bit of) UI Management
 
+- (void)refreshAllWindows
+{
+    for (NSWindow *window in [NSApp windows])
+    {
+        [self refreshSubviewsOfView:[window contentView]];
+    }
+}
+
+- (void)refreshSubviewsOfView:(NSView *)view
+{
+    if ([NSStringFromClass([view class]) isEqualToString:@"DVTSourceTextView"])
+    {
+        [view setNeedsDisplay:YES];
+
+        return;
+    }
+
+    for (NSView *subview in [view subviews])
+    {
+        [self refreshSubviewsOfView:subview];
+    }
+}
+
 - (void)modifyEditorMenu:(id)sender
 {
     dispatch_async(dispatch_get_main_queue(), ^{
