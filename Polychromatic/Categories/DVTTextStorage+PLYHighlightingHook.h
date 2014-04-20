@@ -10,6 +10,4 @@
 
 @interface DVTTextStorage (PLYHighlightingHook)
 
-- (NSColor *)ply_colorAtCharacterIndex:(unsigned long long)index effectiveRange:(NSRangePointer)effectiveRange context:(id)context;
-
 @end

@@ -11,7 +11,11 @@
 @class IDEWorkspace;
 @interface PLYVariableManager : NSObject
 
+#pragma mark - Singleton
+
 + (instancetype)sharedManager;
+
+#pragma mark - Coloring
 
 - (NSColor *)colorForVariable:(NSString *)variable inWorkspace:(IDEWorkspace *)workspace;
 

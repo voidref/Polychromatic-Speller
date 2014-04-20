@@ -8,7 +8,6 @@
 
 #import "DVTTextStorage+PLYHighlightingHook.h"
 
-#import "Polychromatic.h"
 #import "PLYSwizzling.h"
 #import "PLYVariableManager.h"
 #import "DVTSourceModelItem+PLYIdentification.h"
@@ -18,10 +17,14 @@ static IMP originalColorAtCharacterIndexImplementation;
 
 @implementation DVTTextStorage (PLYHighlightingHook)
 
+#pragma mark - Swizzling
+
 + (void)initialize
 {
-    originalColorAtCharacterIndexImplementation = PLYPoseSwizzle([DVTTextStorage class], NSSelectorFromString(@"colorAtCharacterIndex:effectiveRange:context:"), self, @selector(ply_colorAtCharacterIndex:effectiveRange:context:), YES);
+    originalColorAtCharacterIndexImplementation = PLYSwizzleMethod([DVTTextStorage class], NSSelectorFromString(@"colorAtCharacterIndex:effectiveRange:context:"), self, @selector(ply_colorAtCharacterIndex:effectiveRange:context:), YES);
 }
+
+#pragma mark - DVTTextStorage Overrides
 
 - (NSColor *)ply_colorAtCharacterIndex:(unsigned long long)index effectiveRange:(NSRangePointer)effectiveRange context:(NSDictionary *)context
 {
@@ -29,7 +32,7 @@ static IMP originalColorAtCharacterIndexImplementation;
 
     /* We should probably be doing the "effectiveRange" finding, but for now we'll let Xcode solve it out for us. */
 
-    if (![[DVTFontAndColorTheme currentTheme] ply_enabled])
+    if (![[DVTFontAndColorTheme currentTheme] ply_polychromaticEnabled])
     {
         return originalColorAtCharacterIndexImplementation(self, @selector(colorAtCharacterIndex:effectiveRange:context:), index, effectiveRange, context);
     }
@@ -37,7 +40,7 @@ static IMP originalColorAtCharacterIndexImplementation;
     NSColor *color = originalColorAtCharacterIndexImplementation(self, @selector(colorAtCharacterIndex:effectiveRange:context:), index, effectiveRange, context);
     NSRange newRange = *effectiveRange;
     DVTSourceModelItem *item = [self.sourceModelService sourceModelItemAtCharacterIndex:newRange.location];
-
+    
     IDEIndex *workspaceIndex = context[@"IDEIndex"];
 
     /* It's possible for us to simply use the source model, but we may want to express fine-grain control based on the node. Plus, we already have the item onhand. */

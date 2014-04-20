@@ -23,9 +23,9 @@ static char *PLYVariableColorModifierViewIdentifier = "PLYVariableColorModifierV
 
 + (void)load
 {
-    originalViewLoadImp = PLYPoseSwizzle([IDEFontAndColorPrefsPaneController class], @selector(loadView), self, @selector(ply_loadView), YES);
-    originalTabChangeImp = PLYPoseSwizzle([IDEFontAndColorPrefsPaneController class], @selector(_handleTabChanged), self, @selector(ply_handleTabChanged), YES);
-    originalFontPickerImp = PLYPoseSwizzle(self, @selector(_updateFontPickerAndColorWell), self, @selector(ply_updateFontPickerAndColorWell), YES);
+    originalViewLoadImp = PLYSwizzleMethod([IDEFontAndColorPrefsPaneController class], @selector(loadView), self, @selector(ply_loadView), YES);
+    originalTabChangeImp = PLYSwizzleMethod([IDEFontAndColorPrefsPaneController class], @selector(_handleTabChanged), self, @selector(ply_handleTabChanged), YES);
+    originalFontPickerImp = PLYSwizzleMethod(self, @selector(_updateFontPickerAndColorWell), self, @selector(ply_updateFontPickerAndColorWell), YES);
 }
 
 #pragma mark - View Methods
@@ -69,8 +69,8 @@ static char *PLYVariableColorModifierViewIdentifier = "PLYVariableColorModifierV
 {
     originalFontPickerImp(self, @selector(_updateFontPickerAndColorWell));
 
-    [self enabledSwitch].state = [[self theme] ply_enabled];
-    [self ply_setEnabled:[[self theme] ply_enabled]];
+    [self enabledSwitch].state = [[self theme] ply_polychromaticEnabled];
+    [self ply_setEnabled:[[self theme] ply_polychromaticEnabled]];
 
     [self saturationSlider].floatValue = [[self theme] ply_saturation];
     [self ply_setSaturation:[[self theme] ply_saturation]];
@@ -187,6 +187,8 @@ static char *PLYVariableColorModifierViewIdentifier = "PLYVariableColorModifierV
     }
 }
 
+#pragma mark - View Utilities
+
 - (void)addSubviewsOfView:(NSView *)view withClass:(Class)class inArray:(NSMutableArray *)array excludingView:(NSView *)excludingView
 {
     if (view == excludingView)
@@ -204,6 +206,8 @@ static char *PLYVariableColorModifierViewIdentifier = "PLYVariableColorModifierV
         [self addSubviewsOfView:subview withClass:class inArray:array excludingView:excludingView];
     }
 }
+
+#pragma mark - Color Well Management
 
 - (NSArray *)colorWells
 {
@@ -256,6 +260,8 @@ static char *PLYVariableColorModifierViewIdentifier = "PLYVariableColorModifierV
     [colorWell setEnabled:YES];
 }
 
+#pragma mark - State
+
 - (void)adjustControlsToEnabledState
 {
     [[self brightnessSlider] setEnabled:[self ply_Enabled]];
@@ -268,7 +274,7 @@ static char *PLYVariableColorModifierViewIdentifier = "PLYVariableColorModifierV
 
     [self ply_setEnabled:enabled];
 
-    [[self theme] ply_setEnabled:enabled];
+    [[self theme] ply_setPolychromaticEnabled:enabled];
     [self theme].contentNeedsSaving = YES;
 
     [self adjustControlsToEnabledState];
@@ -311,16 +317,11 @@ static char *PLYVariableColorModifierViewIdentifier = "PLYVariableColorModifierV
     return [self valueForKey:@"_fontAndColorItemTable"];
 }
 
-#pragma mark - Associated Object Getters/Setters
+#pragma mark - Associated Object Getters
 
 - (PLYView *)ply_varPrefsView
 {
     return objc_getAssociatedObject(self, PLYVariableColorModifierViewIdentifier);
-}
-
-- (void)ply_setVarPrefsView:(PLYView *)varPrefsView
-{
-    objc_setAssociatedObject(self, PLYVariableColorModifierViewIdentifier, varPrefsView, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
 - (BOOL)ply_Enabled
@@ -328,19 +329,9 @@ static char *PLYVariableColorModifierViewIdentifier = "PLYVariableColorModifierV
     return [objc_getAssociatedObject(self, "ply_Enabled") boolValue];
 }
 
-- (void)ply_setEnabled:(BOOL)enabled
-{
-    objc_setAssociatedObject(self, "ply_Enabled", @(enabled), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-}
-
 - (CGFloat)ply_Saturation
 {
     return [objc_getAssociatedObject(self, "ply_Saturation") floatValue];
-}
-
-- (void)ply_setSaturation:(CGFloat)saturation
-{
-    objc_setAssociatedObject(self, "ply_Saturation", @(saturation), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
 - (CGFloat)ply_Brightness
@@ -348,19 +339,9 @@ static char *PLYVariableColorModifierViewIdentifier = "PLYVariableColorModifierV
     return [objc_getAssociatedObject(self, "ply_Brightness") floatValue];
 }
 
-- (void)ply_setBrightness:(CGFloat)brightness
-{
-    objc_setAssociatedObject(self, "ply_Brightness", @(brightness), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-}
-
 - (NSButton *)enabledSwitch;
 {
     return objc_getAssociatedObject(self, "ply_enabledSwitch");
-}
-
-- (void)ply_setEnabledSwitch:(NSButton *)enabledSwitch
-{
-    objc_setAssociatedObject(self, "ply_enabledSwitch", enabledSwitch, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
 - (NSSlider *)saturationSlider
@@ -368,14 +349,41 @@ static char *PLYVariableColorModifierViewIdentifier = "PLYVariableColorModifierV
     return objc_getAssociatedObject(self, "ply_saturationSlider");
 }
 
-- (void)ply_setSaturationSlider:(NSSlider *)slider
-{
-    objc_setAssociatedObject(self, "ply_saturationSlider", slider, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-}
-
 - (NSSlider *)brightnessSlider
 {
     return objc_getAssociatedObject(self, "ply_brightnessSlider");
+}
+
+#pragma mark - Associated Object Setters
+
+- (void)ply_setVarPrefsView:(PLYView *)varPrefsView
+{
+    objc_setAssociatedObject(self, PLYVariableColorModifierViewIdentifier, varPrefsView, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+- (void)ply_setEnabled:(BOOL)enabled
+{
+    objc_setAssociatedObject(self, "ply_Enabled", @(enabled), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+- (void)ply_setSaturation:(CGFloat)saturation
+{
+    objc_setAssociatedObject(self, "ply_Saturation", @(saturation), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+- (void)ply_setBrightness:(CGFloat)brightness
+{
+    objc_setAssociatedObject(self, "ply_Brightness", @(brightness), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+- (void)ply_setEnabledSwitch:(NSButton *)enabledSwitch
+{
+    objc_setAssociatedObject(self, "ply_enabledSwitch", enabledSwitch, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+- (void)ply_setSaturationSlider:(NSSlider *)slider
+{
+    objc_setAssociatedObject(self, "ply_saturationSlider", slider, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
 - (void)ply_setBrightnessSlider:(NSSlider *)slider

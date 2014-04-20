@@ -16,17 +16,19 @@
 
 @implementation Polychromatic
 
+#pragma mark - Instantiation
+
 + (void)pluginDidLoad:(NSBundle *)plugin
 {
     NSString *currentApplicationName = [[NSBundle mainBundle] infoDictionary][@"CFBundleName"];
 
     if ([currentApplicationName isEqual:@"Xcode"])
     {
-        [self sharedPluginWithBundle:plugin];
+        [self pluginWithBundle:plugin];
     }
 }
 
-+ (instancetype)sharedPluginWithBundle:(NSBundle *)bundle
++ (instancetype)pluginWithBundle:(NSBundle *)bundle
 {
     static id sharedPlugin = nil;
     static dispatch_once_t onceToken;
@@ -38,9 +40,9 @@
     return sharedPlugin;
 }
 
-+ (instancetype)sharedPlugin
++ (instancetype)plugin
 {
-    return [self sharedPluginWithBundle:nil];
+    return [self pluginWithBundle:nil];
 }
 
 - (id)initWithBundle:(NSBundle *)bundle
@@ -49,22 +51,26 @@
     {
         self.bundle = bundle;
 
-        [[NSUserDefaults standardUserDefaults] registerDefaults:@{@"PLYHasCompletedFirstRun": @NO, @"PLYPluginEnabled": @YES}];
+        [self handleFirstRunStatus];
 
-        BOOL hasCompletedFirstRun = [[NSUserDefaults standardUserDefaults] boolForKey:@"PLYHasCompletedFirstRun"];
-        if (!hasCompletedFirstRun)
-        {
-            [self showInstallWindow:self];
-            [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"PLYHasCompletedFirstRun"];
-        }
-
-        [[NSNotificationCenter defaultCenter] addObserver:self
-                                                 selector:@selector(modifyEditorMenu:)
-                                                     name:NSMenuDidChangeItemNotification
-                                                   object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(modifyEditorMenu:) name:NSMenuDidChangeItemNotification object:nil];
     }
 
     return self;
+}
+
+#pragma mark - Preferences/Installation Management
+
+- (void)handleFirstRunStatus
+{
+    [[NSUserDefaults standardUserDefaults] registerDefaults:@{@"PLYHasCompletedFirstRun": @NO}];
+
+    BOOL hasCompletedFirstRun = [[NSUserDefaults standardUserDefaults] boolForKey:@"PLYHasCompletedFirstRun"];
+    if (!hasCompletedFirstRun)
+    {
+        [self showInstallWindow:self];
+        [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"PLYHasCompletedFirstRun"];
+    }
 }
 
 - (void)showInstallWindow:(id)sender
@@ -79,21 +85,24 @@
 
         if (error)
         {
-            NSLog(@"nsfilemanager error: %@", error);
+            NSLog(@"Error in NSFileManager logic: %@", error);
 
             return;
         }
 
+        NSString *destinationDirectory = [NSString stringWithFormat:@"%@/Library/Developer/Xcode/UserData/FontAndColorThemes", NSHomeDirectory()];
+        [[NSFileManager defaultManager] createDirectoryAtPath:destinationDirectory withIntermediateDirectories:YES attributes:nil error:NULL];
+
         [themes enumerateObjectsUsingBlock:^(NSString *themePath, NSUInteger idx, BOOL *stop) {
             NSString *replacementName = [themePath.lastPathComponent stringByReplacingOccurrencesOfString:@".dvtcolortheme" withString:@" (Polychromatic).dvtcolortheme"];
-            NSString *destinationDirectory = [NSString stringWithFormat:@"%@/Library/Developer/Xcode/UserData/FontAndColorThemes", NSHomeDirectory()];
             NSString *destinationPath = [NSString stringWithFormat:@"%@/%@", destinationDirectory, replacementName];
 
-            [[NSFileManager defaultManager] createDirectoryAtPath:destinationDirectory withIntermediateDirectories:YES attributes:nil error:NULL];
-            [[NSFileManager defaultManager] copyItemAtPath:[NSString stringWithFormat:@"%@/%@", basePath, themePath] toPath:destinationPath error:&error];
+            [[NSFileManager defaultManager] copyItemAtPath:[NSString stringWithFormat:@"%@/%@", basePath, themePath] toPath:destinationPath error:nil];
         }];
     }
 }
+
+#pragma mark - (A bit of) UI Management
 
 - (void)modifyEditorMenu:(id)sender
 {
@@ -119,9 +128,18 @@
     });
 }
 
+#pragma mark - NSMenuValidation
+
 - (BOOL)validateMenuItem:(NSMenuItem *)menuItem
 {
     return YES;
+}
+
+#pragma mark - Cleanup
+
+- (void)dealloc
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 @end

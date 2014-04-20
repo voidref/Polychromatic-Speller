@@ -10,13 +10,16 @@
 
 @interface DVTFontAndColorTheme (PLYDataInjection)
 
-- (void)ply_setEnabled:(BOOL)enabled;
-- (BOOL)ply_enabled;
+#pragma mark - Getters
 
-- (void)ply_setSaturation:(CGFloat)saturation;
+- (BOOL)ply_polychromaticEnabled;
 - (CGFloat)ply_saturation;
-
-- (void)ply_setBrightness:(CGFloat)brightness;
 - (CGFloat)ply_brightness;
+
+#pragma mark - Setters
+
+- (void)ply_setPolychromaticEnabled:(BOOL)enabled;
+- (void)ply_setSaturation:(CGFloat)saturation;
+- (void)ply_setBrightness:(CGFloat)brightness;
 
 @end

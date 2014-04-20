@@ -14,11 +14,15 @@ static IMP originalDataLoadImp;
 
 @implementation DVTFontAndColorTheme (PLYDataInjection)
 
+#pragma mark - Swizzling
+
 + (void)load
 {
-    originalDataRepImp = PLYPoseSwizzle(self, @selector(dataRepresentationWithError:), self, @selector(ply_dataRepresentationWithError:), YES);
-    originalDataLoadImp = PLYPoseSwizzle(self, @selector(_loadFontsAndColors), self, @selector(ply_loadFontsAndColors), YES);
+    originalDataRepImp = PLYSwizzleMethod(self, @selector(dataRepresentationWithError:), self, @selector(ply_dataRepresentationWithError:), YES);
+    originalDataLoadImp = PLYSwizzleMethod(self, @selector(_loadFontsAndColors), self, @selector(ply_loadFontsAndColors), YES);
 }
+
+#pragma mark - Polychromatic Data Injection
 
 - (BOOL)ply_loadFontsAndColors
 {
@@ -42,7 +46,7 @@ static IMP originalDataLoadImp;
         NSError *error = nil;
         NSMutableDictionary *dict = [NSPropertyListSerialization propertyListWithData:data options:NSPropertyListMutableContainersAndLeaves format:&format error:&error];
 
-        [self ply_setEnabled:[dict[@"PLYEnabled"] boolValue]];
+        [self ply_setPolychromaticEnabled:[dict[@"PLYEnabled"] boolValue]];
         [self ply_setBrightness:[dict[@"PLYVarBrightness"] floatValue]];
         [self ply_setSaturation:[dict[@"PLYVarSaturation"] floatValue]];
     }
@@ -61,7 +65,7 @@ static IMP originalDataLoadImp;
 
         NSMutableDictionary *dict = [NSPropertyListSerialization propertyListWithData:data options:NSPropertyListMutableContainersAndLeaves format:&format error:arg1];
 
-        BOOL enabled = [self ply_enabled];
+        BOOL enabled = [self ply_polychromaticEnabled];
         CGFloat saturation = [self ply_saturation];
         CGFloat brightness = [self ply_brightness];
 
@@ -85,19 +89,11 @@ static IMP originalDataLoadImp;
     return data;
 }
 
-- (void)ply_setEnabled:(BOOL)enabled;
-{
-    objc_setAssociatedObject(self, "ply_enabled", @(enabled), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-}
+#pragma mark - Getters
 
-- (BOOL)ply_enabled;
+- (BOOL)ply_polychromaticEnabled
 {
-    return [objc_getAssociatedObject(self, "ply_enabled") boolValue];
-}
-
-- (void)ply_setSaturation:(CGFloat)saturation
-{
-    objc_setAssociatedObject(self, "ply_saturation", @(saturation), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    return [objc_getAssociatedObject(self, "ply_polychromaticEnabled") boolValue];
 }
 
 - (CGFloat)ply_saturation
@@ -105,14 +101,27 @@ static IMP originalDataLoadImp;
     return [objc_getAssociatedObject(self, "ply_saturation") floatValue];
 }
 
+- (CGFloat)ply_brightness
+{
+    return [objc_getAssociatedObject(self, "ply_brightness") floatValue];
+}
+
+#pragma mark - Setters
+
+- (void)ply_setPolychromaticEnabled:(BOOL)enabled;
+{
+    objc_setAssociatedObject(self, "ply_polychromaticEnabled", @(enabled), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+- (void)ply_setSaturation:(CGFloat)saturation
+{
+    objc_setAssociatedObject(self, "ply_saturation", @(saturation), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
 - (void)ply_setBrightness:(CGFloat)brightness
 {
     objc_setAssociatedObject(self, "ply_brightness", @(brightness), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
-- (CGFloat)ply_brightness
-{
-    return [objc_getAssociatedObject(self, "ply_brightness") floatValue];
-}
 
 @end

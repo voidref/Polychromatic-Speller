@@ -48,12 +48,7 @@ static NSString *const IDEIndexDidIndexWorkspaceNotification = @"IDEIndexDidInde
     return self;
 }
 
-#pragma mark - Variable Management
-
-- (NSMutableOrderedSet *)variableSetForWorkspace:(IDEWorkspace *)workspace
-{
-    return self.workspaces[workspace.filePath.pathString];
-}
+#pragma mark - Coloring
 
 - (NSColor *)colorForVariable:(NSString *)variable inWorkspace:(IDEWorkspace *)workspace
 {
@@ -77,12 +72,28 @@ static NSString *const IDEIndexDidIndexWorkspaceNotification = @"IDEIndexDidInde
     return [NSColor colorWithCalibratedHue:hueValue saturation:[[DVTFontAndColorTheme currentTheme] ply_saturation] brightness:[[DVTFontAndColorTheme currentTheme] ply_brightness] alpha:1.f];
 }
 
+#pragma mark - Variable Management
+
+- (NSMutableOrderedSet *)variableSetForWorkspace:(IDEWorkspace *)workspace
+{
+    return self.workspaces[workspace.filePath.pathString];
+}
+
+#pragma mark - NSNotificationCenter
+
 - (void)indexDidIndexWorkspaceNotification:(NSNotification *)notification
 {
     IDEIndex *index = notification.object;
     IDEWorkspace *workspace = [index valueForKey:@"_workspace"];
 
     [[self variableSetForWorkspace:workspace] removeAllObjects];
+}
+
+#pragma mark - Cleanup
+
+- (void)dealloc
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 @end

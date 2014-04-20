@@ -10,6 +10,8 @@
 
 @interface Polychromatic : NSObject
 
-+ (instancetype)sharedPlugin;
+#pragma mark - Shared Instance
+
++ (instancetype)plugin;
 
 @end
