@@ -24,7 +24,6 @@ IMP PLYSwizzleMethod(Class originalClass, SEL originalSelector, Class posingClas
         newMethod = class_getClassMethod(posingClass, replacementSelector);
 
         originalClass = object_getClass((id)originalClass);
-        posingClass = object_getClass((id)posingClass);
     }
 
     IMP originalImp = method_getImplementation(origMethod);
