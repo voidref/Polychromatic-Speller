@@ -35,12 +35,9 @@ static IMP originalColorAtCharacterIndexImplementation;
 
     NSColor *color = originalColorAtCharacterIndexImplementation(self, @selector(colorAtCharacterIndex:effectiveRange:context:), index, effectiveRange, context);
     NSRange newRange = *effectiveRange;
-
     DVTSourceModelItem *item = [self.sourceModelService sourceModelItemAtCharacterIndex:newRange.location];
-    NSString *string = [self.sourceModelService stringForItem:item];
 
     IDEIndex *workspaceIndex = context[@"IDEIndex"];
-    IDEWorkspace *workspace = [workspaceIndex valueForKey:@"_workspace"];
 
     /* It's possible for us to simply use the source model, but we may want to express fine-grain control based on the node. Plus, we already have the item onhand. */
 
@@ -50,6 +47,9 @@ static IMP originalColorAtCharacterIndexImplementation;
         NSDictionary *indexState = [workspaceIndex indexState];
         if ([indexState count] > 0)
         {
+            NSString *string = [self.sourceModelService stringForItem:item];
+            IDEWorkspace *workspace = [workspaceIndex valueForKey:@"_workspace"];
+
             color = [[PLYVariableManager sharedManager] colorForVariable:string inWorkspace:workspace];
         }
     }
