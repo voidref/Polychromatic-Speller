@@ -90,19 +90,11 @@ static char *PLYVariableColorModifierViewIdentifier = "PLYVariableColorModifierV
     PLYView *variablePrefsView = [[PLYView alloc] initWithFrame:CGRectMake(0.f, 0.f, [self ply_fontAndColorItemTable].frame.size.width, 305.f)];
     [variablePrefsView setAutoresizingMask:NSViewHeightSizable];
 
-    NSTextField *polychromaticLabel= [[NSTextField alloc] initWithFrame:NSMakeRect(40.f, 30.f, 95.f, 20.f)];
-    [polychromaticLabel setEditable:NO];
-    [polychromaticLabel setBezeled:NO];
-    [polychromaticLabel setSelectable:NO];
-    polychromaticLabel.stringValue = @"Polychromatic:";
-    polychromaticLabel.wantsLayer = YES;
-    [variablePrefsView addSubview:polychromaticLabel];
-
-    NSButton *polychromaticSwitch = [[NSButton alloc] initWithFrame:NSMakeRect(135.f, 29.f, 150.f, 20.f)];
+    NSButton *polychromaticSwitch = [[NSButton alloc] initWithFrame:NSMakeRect(40.f, 29.f, 250.f, 20.f)];
     [polychromaticSwitch setButtonType:NSSwitchButton];
     [polychromaticSwitch setTarget:self];
     [polychromaticSwitch setAction:@selector(enabledChanged:)];
-    polychromaticSwitch.title = @"Enable Polychromatic";
+    polychromaticSwitch.title = @"Highlight variables dynamically";
     [variablePrefsView addSubview:polychromaticSwitch];
     [self ply_setEnabledSwitch:polychromaticSwitch];
 
