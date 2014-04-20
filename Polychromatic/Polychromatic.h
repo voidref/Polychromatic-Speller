@@ -14,4 +14,8 @@
 
 + (instancetype)plugin;
 
+#pragma mark - Interface Management
+
+- (void)refreshAllWindows;
+
 @end

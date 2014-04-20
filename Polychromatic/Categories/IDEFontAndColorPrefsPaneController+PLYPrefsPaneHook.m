@@ -7,6 +7,8 @@
 //
 
 #import "IDEFontAndColorPrefsPaneController+PLYPrefsPaneHook.h"
+
+#import "Polychromatic.h"
 #import "PLYSwizzling.h"
 #import "PLYView.h"
 #import "DVTFontAndColorTheme+PLYDataInjection.h"
@@ -278,6 +280,8 @@ static char *PLYVariableColorModifierViewIdentifier = "PLYVariableColorModifierV
     [self theme].contentNeedsSaving = YES;
 
     [self adjustControlsToEnabledState];
+
+    [[Polychromatic plugin] refreshAllWindows];
 }
 
 - (void)saturationChanged:(NSSlider *)slider
