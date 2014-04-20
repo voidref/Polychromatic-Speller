@@ -235,6 +235,10 @@ static char *PLYVariableColorModifierViewIdentifier = "PLYVariableColorModifierV
         NSTextField *label = [superview.subviews lastObject];
         label.stringValue = [NSString stringWithFormat:@"Sample %lu", index];
     }
+
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [[Polychromatic plugin] refreshAllWindows];
+    });
 }
 
 - (void)preserveColorWell:(NSColorWell *)colorWell
