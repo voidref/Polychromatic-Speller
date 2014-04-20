@@ -17,7 +17,17 @@ static IMP originalViewLoadImp;
 static IMP originalTabChangeImp;
 static IMP originalFontPickerImp;
 
-static char *PLYVariableColorModifierViewIdentifier = "PLYVariableColorModifierViewIdentifier";
+static char *PLYVariableColorModifierViewKey = "ply_variableColorModifierView";
+static char *PLYEnabledSwitchKey = "ply_enabledSwitch";
+static char *PLYSaturationSliderKey = "ply_saturationSlider";
+static char *PLYBrightnessSliderKey = "ply_brightnessSlider";
+
+static char *PLYEnabledKey = "ply_enabled";
+static char *PLYSaturationKey = "ply_saturation";
+static char *PLYBrightnessKey = "ply_brightness";
+
+static char *PLYColorWellPreviousColorKey = "ply_colorWellPreviousColor";
+static char *PLYColorWellPreviousTitleKey = "ply_colorWellPreviousTitle";
 
 @implementation IDEFontAndColorPrefsPaneController (PLYPrefsPaneHook)
 
@@ -248,8 +258,8 @@ static char *PLYVariableColorModifierViewIdentifier = "PLYVariableColorModifierV
 
     [colorWell setEnabled:NO];
 
-    objc_setAssociatedObject(colorWell, "ply_prevColor", colorWell.color, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-    objc_setAssociatedObject(colorWell, "ply_prevTitle", label.stringValue, OBJC_ASSOCIATION_COPY_NONATOMIC);
+    objc_setAssociatedObject(colorWell, PLYColorWellPreviousColorKey, colorWell.color, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    objc_setAssociatedObject(colorWell, PLYColorWellPreviousTitleKey, label.stringValue, OBJC_ASSOCIATION_COPY_NONATOMIC);
 }
 
 - (void)restoreColorWell:(NSColorWell *)colorWell
@@ -257,11 +267,11 @@ static char *PLYVariableColorModifierViewIdentifier = "PLYVariableColorModifierV
     NSView *superview = colorWell.superview;
     NSTextField *label = [superview.subviews lastObject];
 
-    colorWell.color = objc_getAssociatedObject(colorWell, "ply_prevColor");
-    label.stringValue = objc_getAssociatedObject(colorWell, "ply_prevTitle");
+    colorWell.color = objc_getAssociatedObject(colorWell, PLYColorWellPreviousColorKey);
+    label.stringValue = objc_getAssociatedObject(colorWell, PLYColorWellPreviousTitleKey);
 
-    objc_setAssociatedObject(colorWell, "ply_prevColor", nil, OBJC_ASSOCIATION_ASSIGN);
-    objc_setAssociatedObject(colorWell, "ply_prevTitle", nil, OBJC_ASSOCIATION_ASSIGN);
+    objc_setAssociatedObject(colorWell, PLYColorWellPreviousColorKey, nil, OBJC_ASSOCIATION_ASSIGN);
+    objc_setAssociatedObject(colorWell, PLYColorWellPreviousTitleKey, nil, OBJC_ASSOCIATION_ASSIGN);
 
     [colorWell setEnabled:YES];
 }
@@ -329,74 +339,74 @@ static char *PLYVariableColorModifierViewIdentifier = "PLYVariableColorModifierV
 
 - (PLYView *)ply_varPrefsView
 {
-    return objc_getAssociatedObject(self, PLYVariableColorModifierViewIdentifier);
+    return objc_getAssociatedObject(self, PLYVariableColorModifierViewKey);
 }
 
 - (BOOL)ply_Enabled
 {
-    return [objc_getAssociatedObject(self, "ply_Enabled") boolValue];
+    return [objc_getAssociatedObject(self, PLYEnabledKey) boolValue];
 }
 
 - (CGFloat)ply_Saturation
 {
-    return [objc_getAssociatedObject(self, "ply_Saturation") floatValue];
+    return [objc_getAssociatedObject(self, PLYSaturationKey) floatValue];
 }
 
 - (CGFloat)ply_Brightness
 {
-    return [objc_getAssociatedObject(self, "ply_Brightness") floatValue];
+    return [objc_getAssociatedObject(self, PLYBrightnessKey) floatValue];
 }
 
 - (NSButton *)enabledSwitch;
 {
-    return objc_getAssociatedObject(self, "ply_enabledSwitch");
+    return objc_getAssociatedObject(self, PLYEnabledSwitchKey);
 }
 
 - (NSSlider *)saturationSlider
 {
-    return objc_getAssociatedObject(self, "ply_saturationSlider");
+    return objc_getAssociatedObject(self, PLYSaturationSliderKey);
 }
 
 - (NSSlider *)brightnessSlider
 {
-    return objc_getAssociatedObject(self, "ply_brightnessSlider");
+    return objc_getAssociatedObject(self, PLYBrightnessSliderKey);
 }
 
 #pragma mark - Associated Object Setters
 
 - (void)ply_setVarPrefsView:(PLYView *)varPrefsView
 {
-    objc_setAssociatedObject(self, PLYVariableColorModifierViewIdentifier, varPrefsView, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    objc_setAssociatedObject(self, PLYVariableColorModifierViewKey, varPrefsView, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
 - (void)ply_setEnabled:(BOOL)enabled
 {
-    objc_setAssociatedObject(self, "ply_Enabled", @(enabled), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    objc_setAssociatedObject(self, PLYEnabledKey, @(enabled), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
 - (void)ply_setSaturation:(CGFloat)saturation
 {
-    objc_setAssociatedObject(self, "ply_Saturation", @(saturation), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    objc_setAssociatedObject(self, PLYSaturationKey, @(saturation), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
 - (void)ply_setBrightness:(CGFloat)brightness
 {
-    objc_setAssociatedObject(self, "ply_Brightness", @(brightness), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    objc_setAssociatedObject(self, PLYBrightnessKey, @(brightness), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
 - (void)ply_setEnabledSwitch:(NSButton *)enabledSwitch
 {
-    objc_setAssociatedObject(self, "ply_enabledSwitch", enabledSwitch, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    objc_setAssociatedObject(self, PLYEnabledSwitchKey, enabledSwitch, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
 - (void)ply_setSaturationSlider:(NSSlider *)slider
 {
-    objc_setAssociatedObject(self, "ply_saturationSlider", slider, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    objc_setAssociatedObject(self, PLYSaturationSliderKey, slider, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
 - (void)ply_setBrightnessSlider:(NSSlider *)slider
 {
-    objc_setAssociatedObject(self, "ply_brightnessSlider", slider, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    objc_setAssociatedObject(self, PLYBrightnessSliderKey, slider, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
 @end

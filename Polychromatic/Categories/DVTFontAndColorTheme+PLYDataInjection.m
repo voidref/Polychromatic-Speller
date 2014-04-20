@@ -12,6 +12,10 @@
 static IMP originalDataRepImp;
 static IMP originalDataLoadImp;
 
+static char *PLYPolychromaticEnabledKey = "ply_polychromaticEnabled";
+static char *PLYSaturationKey = "ply_saturation";
+static char *PLYBrightnessKey = "ply_brightness";
+
 @implementation DVTFontAndColorTheme (PLYDataInjection)
 
 #pragma mark - Swizzling
@@ -93,34 +97,34 @@ static IMP originalDataLoadImp;
 
 - (BOOL)ply_polychromaticEnabled
 {
-    return [objc_getAssociatedObject(self, "ply_polychromaticEnabled") boolValue];
+    return [objc_getAssociatedObject(self, PLYPolychromaticEnabledKey) boolValue];
 }
 
 - (CGFloat)ply_saturation
 {
-    return [objc_getAssociatedObject(self, "ply_saturation") floatValue];
+    return [objc_getAssociatedObject(self, PLYSaturationKey) floatValue];
 }
 
 - (CGFloat)ply_brightness
 {
-    return [objc_getAssociatedObject(self, "ply_brightness") floatValue];
+    return [objc_getAssociatedObject(self, PLYBrightnessKey) floatValue];
 }
 
 #pragma mark - Setters
 
 - (void)ply_setPolychromaticEnabled:(BOOL)enabled;
 {
-    objc_setAssociatedObject(self, "ply_polychromaticEnabled", @(enabled), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    objc_setAssociatedObject(self, PLYPolychromaticEnabledKey, @(enabled), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
 - (void)ply_setSaturation:(CGFloat)saturation
 {
-    objc_setAssociatedObject(self, "ply_saturation", @(saturation), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    objc_setAssociatedObject(self, PLYSaturationKey, @(saturation), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
 - (void)ply_setBrightness:(CGFloat)brightness
 {
-    objc_setAssociatedObject(self, "ply_brightness", @(brightness), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    objc_setAssociatedObject(self, PLYBrightnessKey, @(brightness), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
 
