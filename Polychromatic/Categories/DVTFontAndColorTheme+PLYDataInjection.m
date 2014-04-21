@@ -139,5 +139,4 @@ static char *PLYBrightnessKey = "ply_brightness";
     objc_setAssociatedObject(self, PLYBrightnessKey, @(brightness), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
-
 @end
