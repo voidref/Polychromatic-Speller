@@ -12,6 +12,7 @@
 static IMP originalDataRepImp;
 static IMP originalDataLoadImp;
 
+static char *PLYPolychromaticSupportedKey = "ply_polychromaticSupported";
 static char *PLYPolychromaticEnabledKey = "ply_polychromaticEnabled";
 static char *PLYSaturationKey = "ply_saturation";
 static char *PLYBrightnessKey = "ply_brightness";
@@ -86,6 +87,7 @@ static char *PLYBrightnessKey = "ply_brightness";
         dict[@"PLYEnabled"] = @(enabled);
         dict[@"PLYVarSaturation"] = @(saturation);
         dict[@"PLYVarBrightness"] = @(brightness);
+        dict[@"PLYSupported"] = @([self ply_polychromaticSupported]);
 
         data = [NSPropertyListSerialization dataFromPropertyList:dict format:format errorDescription:&error];
     }
@@ -94,6 +96,11 @@ static char *PLYBrightnessKey = "ply_brightness";
 }
 
 #pragma mark - Getters
+
+- (BOOL)ply_polychromaticSupported
+{
+    return [objc_getAssociatedObject(self, PLYPolychromaticSupportedKey) boolValue];
+}
 
 - (BOOL)ply_polychromaticEnabled
 {
@@ -111,6 +118,11 @@ static char *PLYBrightnessKey = "ply_brightness";
 }
 
 #pragma mark - Setters
+
+- (void)ply_setPolychromaticSupported:(BOOL)supported
+{
+    objc_setAssociatedObject(self, PLYPolychromaticSupportedKey, @(supported), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
 
 - (void)ply_setPolychromaticEnabled:(BOOL)enabled;
 {

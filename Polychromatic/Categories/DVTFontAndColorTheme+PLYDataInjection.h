@@ -12,12 +12,14 @@
 
 #pragma mark - Getters
 
+- (BOOL)ply_polychromaticSupported;
 - (BOOL)ply_polychromaticEnabled;
 - (CGFloat)ply_saturation;
 - (CGFloat)ply_brightness;
 
 #pragma mark - Setters
 
+- (void)ply_setPolychromaticSupported:(BOOL)supported;
 - (void)ply_setPolychromaticEnabled:(BOOL)enabled;
 - (void)ply_setSaturation:(CGFloat)saturation;
 - (void)ply_setBrightness:(CGFloat)brightness;
