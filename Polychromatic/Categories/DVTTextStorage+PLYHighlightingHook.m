@@ -41,7 +41,14 @@ static IMP originalColorAtCharacterIndexImplementation;
 
     IDEIndex *workspaceIndex = context[@"IDEIndex"];
     IDEWorkspace *workspace = [workspaceIndex valueForKey:@"_workspace"];
-
+    
+    if ( item.isIdentifier ) {
+        NSColor *change = [self checkSpelling:string item:item context:context];
+        if ( change ) {
+            return change;
+        }
+    }
+    
     /* It's possible for us to simply use the source model, but we may want to express fine-grain control based on the node. Plus, we already have the item onhand. */
 
     if ([item ply_isIdentifier] && ![[DVTSourceNodeTypes nodeTypeNameForId:item.parent.nodeType] isEqualToString:@"xcode.syntax.name.partial"] && workspaceIndex)
@@ -50,6 +57,83 @@ static IMP originalColorAtCharacterIndexImplementation;
     }
 
     return color;
+}
+
+
+- (NSColor *)checkSpelling:(NSString *)string item:(DVTSourceModelItem *)item context:(NSDictionary *)context {
+
+    static NSMutableOrderedSet *spelledCorrectly = nil;
+    static NSMutableOrderedSet *knownMisspellings = nil;
+    
+    // flush the misspellings cache every so often
+    if ( knownMisspellings && knownMisspellings.count > 1024 ) {
+        knownMisspellings = nil;
+    }
+    
+    if ( !knownMisspellings ) {
+        knownMisspellings = [NSMutableOrderedSet orderedSet];
+    }
+    
+    if ( !spelledCorrectly ) {
+        spelledCorrectly = [NSMutableOrderedSet orderedSet];
+    }
+
+    if ( [spelledCorrectly containsObject:string] ) {
+        return nil;
+    }
+    
+    if ( [knownMisspellings containsObject:string] ) {
+        return NSColor.whiteColor;
+    }
+    
+    NSColor *errorColor = nil;
+    NSSpellChecker *checker = [NSSpellChecker sharedSpellChecker];
+    NSRange spellRange = [checker checkSpellingOfString:string startingAt:0];
+    
+    BOOL spelledWrong = spellRange.length > 0;
+
+    if ( spelledWrong ) {
+        
+        // SpellChecker seems to have a problem with the number of words in a camel case string.
+        NSArray *split = [self splitCamelHalves:string];
+        
+        if ( split.count == 2 ) {
+            NSRange firstHalf = [checker checkSpellingOfString:split.firstObject startingAt:0];
+            
+            if ( firstHalf.length == 0 ) {
+                NSRange secondHalf = [checker checkSpellingOfString:split.lastObject startingAt:0];
+                
+                if ( secondHalf.length == 0 ) {
+                    spelledWrong = NO;
+                }
+            }
+        }
+    }
+    
+    if ( spelledWrong ) {
+        errorColor = NSColor.whiteColor;
+        [knownMisspellings addObject:string];
+    } else {
+        [spelledCorrectly addObject:string];
+    }
+    
+    return errorColor;
+}
+
+- (NSArray *)splitCamelHalves:(NSString *)identifier {
+    NSRange firstHalf = NSMakeRange(0, identifier.length / 2);
+    NSRange lastHalf = NSMakeRange(firstHalf.length, identifier.length - firstHalf.length);
+    
+    NSRange split = [identifier rangeOfCharacterFromSet:[NSCharacterSet uppercaseLetterCharacterSet] options:0 range:lastHalf];
+    
+    if ( split.length == 0 ) {
+        return nil;
+    }
+    firstHalf.length = split.location;
+    lastHalf.location = split.location;
+    lastHalf.length = identifier.length - firstHalf.length;
+    
+    return @[ [identifier substringWithRange:firstHalf], [identifier substringWithRange:lastHalf] ];
 }
 
 @end
