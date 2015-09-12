@@ -19,16 +19,12 @@ static IMP originalColorAtCharacterIndexImplementation;
 
 + (void)initialize
 {
-<<<<<<< HEAD
-    [@"initialized" writeToFile:@"/tmp/spell.out" atomically:YES encoding:NSUTF8StringEncoding error:nil];
     originalColorAtCharacterIndexImplementation = PLYPoseSwizzle([DVTTextStorage class], NSSelectorFromString(@"colorAtCharacterIndex:effectiveRange:context:"), self, @selector(ply_colorAtCharacterIndex:effectiveRange:context:), YES);
-=======
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^
     {
         originalColorAtCharacterIndexImplementation = PLYPoseSwizzle([DVTTextStorage class], NSSelectorFromString(@"colorAtCharacterIndex:effectiveRange:context:"), self, @selector(ply_colorAtCharacterIndex:effectiveRange:context:), YES);
     });
->>>>>>> kolinkrewinkel/master
 }
 
 - (NSColor *)ply_colorAtCharacterIndex:(unsigned long long)index effectiveRange:(NSRangePointer)effectiveRange context:(NSDictionary *)context
@@ -38,21 +34,12 @@ static IMP originalColorAtCharacterIndexImplementation;
     
     /* We should probably be doing the "effectiveRange" finding, but for now we'll let Xcode solve it out for us. */
 
-<<<<<<< HEAD
-    NSColor *color = originalColorAtCharacterIndexImplementation(self, @selector(colorAtCharacterIndex:effectiveRange:context:), index, effectiveRange, context);
-
-//    if (![[Polychromatic sharedPlugin] pluginEnabled])
-//    {
-//        return color;
-//    }
-
     NSRange newRange = *effectiveRange;
 
     DVTSourceModelItem *item = [self.sourceModelService sourceModelItemAtCharacterIndex:newRange.location];
     NSString *string = [self.sourceModelService stringForItem:item];
-    [string writeToFile:@"/tmp/spell.out" atomically:YES encoding:NSUTF8StringEncoding error:nil];
-    IDEIndex *workspaceIndex = context[@"IDEIndex"];
-    IDEWorkspace *workspace = [workspaceIndex valueForKey:@"_workspace"];
+//    IDEIndex *workspaceIndex = context[@"IDEIndex"];
+//    IDEWorkspace *workspace = [workspaceIndex valueForKey:@"_workspace"];
     
     if ( item.isIdentifier ) {
         NSColor *change = [self checkSpelling:string item:item context:context];
@@ -62,15 +49,12 @@ static IMP originalColorAtCharacterIndexImplementation;
     }
     
     /* It's possible for us to simply use the source model, but we may want to express fine-grain control based on the node. Plus, we already have the item onhand. */
-=======
     NSColor *originalColor = originalColorAtCharacterIndexImplementation(self, @selector(colorAtCharacterIndex:effectiveRange:context:), index, effectiveRange, context);
 
     if (![[Polychromatic sharedPlugin] pluginEnabled])
     {
         return originalColor;
     }
-
-    NSRange newRange = *effectiveRange;
 
     static Class swiftLanguageServiceClass = nil;
     static dispatch_once_t onceToken;
@@ -90,13 +74,12 @@ static IMP originalColorAtCharacterIndexImplementation;
             nodeType == [DVTSourceNodeTypes registerNodeTypeNamed:@"xcode.syntax.identifier"])
         {
             PLYMockSwift *fauxSwiftService = (PLYMockSwift *)self.languageService;
-            NSRange funcDefinitionRange = [fauxSwiftService methodDefinitionRangeAtIndex:newRange.location];
+            NSRange functionDefinitionRange = [fauxSwiftService methodDefinitionRangeAtIndex:newRange.location];
 
-            if (funcDefinitionRange.location == NSIntegerMax)
+            if (functionDefinitionRange.location == NSIntegerMax)
             {
                 NSArray *nameRanges;
                 NSString *name = [self symbolNameAtCharacterIndex:newRange.location nameRanges:&nameRanges];
->>>>>>> kolinkrewinkel/master
 
                 return [[PLYVariableManager sharedManager] colorForVariable:name];
             }
@@ -135,14 +118,7 @@ static IMP originalColorAtCharacterIndexImplementation;
         }
     }
 
-<<<<<<< HEAD
-    int misadfasd;
-    (void)misadfasd;
-    return color;
-=======
     return originalColor;
-
->>>>>>> kolinkrewinkel/master
 }
 
 

@@ -220,7 +220,7 @@
 		33B3A3E218CD36BE00AA64C8 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0510;
+				LastUpgradeCheck = 0700;
 				ORGANIZATIONNAME = "Kolin Krewinkel";
 			};
 			buildConfigurationList = 33B3A3E518CD36BE00AA64C8 /* Build configuration list for PBXProject "Polychromatic" */;
@@ -300,6 +300,7 @@
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
@@ -373,6 +374,7 @@
 					"$(SYSTEM_APPS_DIR)/Xcode.app/Contents/Frameworks/IDEKit.framework/Versions/A",
 					"$(SYSTEM_APPS_DIR)/Xcode.app/Contents/Frameworks/IDEFoundation.framework/Versions/A",
 				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.kolinkrewinkel.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = Polychromatic;
 				WRAPPER_EXTENSION = xcplugin;
 			};
@@ -398,6 +400,7 @@
 					"$(SYSTEM_APPS_DIR)/Xcode.app/Contents/Frameworks/IDEKit.framework/Versions/A",
 					"$(SYSTEM_APPS_DIR)/Xcode.app/Contents/Frameworks/IDEFoundation.framework/Versions/A",
 				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.kolinkrewinkel.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = Polychromatic;
 				WRAPPER_EXTENSION = xcplugin;
 			};
