@@ -17,8 +17,11 @@
 
 - (BOOL)ply_isIdentifier
 {
-    //      Local Vars/Arguments     Ivars and Properties     Instances of Macros      Macro Definitions
-    return (self.nodeType == 24) || (self.nodeType == 16) || (self.nodeType == 17) || (self.nodeType == 49);
+    return (self.nodeType == 24 || // Local Vars/Arguments
+            self.nodeType == 16 || // Ivars and Properties
+            self.nodeType == 17 || // Instances of Macros
+            self.nodeType == 49 || // Macro Definitions
+            self.nodeType == 9);
 }
 
 - (BOOL)ply_isKeyword
@@ -65,6 +68,21 @@
 - (BOOL)ply_isUserFunction
 {
     return (self.nodeType == 13);
+}
+
+- (BOOL)ply_inheritsFromNodeOfType:(short)nodeType
+{
+    DVTSourceModelItem *parent = self.parent;
+    while (parent) {
+        if (parent.nodeType == nodeType)
+        {
+            return YES;
+        }
+
+        parent = parent.parent;
+    }
+
+    return NO;
 }
 
 @end

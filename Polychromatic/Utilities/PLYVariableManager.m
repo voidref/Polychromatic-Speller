@@ -6,18 +6,12 @@
 //  Copyright (c) 2014 Kolin Krewinkel. All rights reserved.
 //
 
+#import <CommonCrypto/CommonDigest.h>
+
 #import "PLYVariableManager.h"
 #import "DVTInterfaces.h"
 
 #import "DVTFontAndColorTheme+PLYDataInjection.h"
-
-static NSString *const IDEIndexDidIndexWorkspaceNotification = @"IDEIndexDidIndexWorkspaceNotification";
-
-@interface PLYVariableManager ()
-
-@property (nonatomic, strong) NSMutableDictionary *workspaces;
-
-@end
 
 @implementation PLYVariableManager
 
@@ -34,55 +28,28 @@ static NSString *const IDEIndexDidIndexWorkspaceNotification = @"IDEIndexDidInde
     return sharedManager;
 }
 
-#pragma mark - Initialization
-
-- (id)init
-{
-    if ((self = [super init]))
-    {
-        self.workspaces = [[NSMutableDictionary alloc] init];
-
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(indexDidIndexWorkspaceNotification:) name:IDEIndexDidIndexWorkspaceNotification object:nil];
-    }
-
-    return self;
-}
-
 #pragma mark - Variable Management
 
-- (NSMutableOrderedSet *)variableSetForWorkspace:(IDEWorkspace *)workspace
+- (NSColor *)colorForVariable:(NSString *)variable
 {
-    return self.workspaces[workspace.filePath.pathString];
-}
-
-- (NSColor *)colorForVariable:(NSString *)variable inWorkspace:(IDEWorkspace *)workspace
-{
-    NSMutableOrderedSet *variables = [self variableSetForWorkspace:workspace];
-
-    if (!variables && workspace.filePath.pathString)
-    {
-        variables = [[NSMutableOrderedSet alloc] init];
-        [self.workspaces setObject:variables forKey:workspace.filePath.pathString];
-    }
-
-    if (![variables containsObject:variable])
-    {
-        [variables addObject:variable];
-        [variables sortUsingDescriptors:@[[[NSSortDescriptor alloc] initWithKey:@"self" ascending:YES selector:@selector(localizedCaseInsensitiveCompare:)]]];
-    }
-
-    NSUInteger index = [variables indexOfObject:variable];
-    CGFloat hueValue = (CGFloat)index/variables.count;
+    NSUInteger numberOfDifferentColors = 4096;
+    NSUInteger shortHashValue = [self ply_FNV1aHash:variable] % numberOfDifferentColors;
+    CGFloat hueValue = (CGFloat)shortHashValue/(CGFloat)numberOfDifferentColors;
 
     return [NSColor colorWithCalibratedHue:hueValue saturation:[[DVTFontAndColorTheme currentTheme] ply_saturation] brightness:[[DVTFontAndColorTheme currentTheme] ply_brightness] alpha:1.f];
 }
 
-- (void)indexDidIndexWorkspaceNotification:(NSNotification *)notification
+- (uint64_t)ply_FNV1aHash:(NSString *)stringToHash
 {
-    IDEIndex *index = notification.object;
-    IDEWorkspace *workspace = [index valueForKey:@"_workspace"];
-
-    [[self variableSetForWorkspace:workspace] removeAllObjects];
+    // http://en.wikipedia.org/wiki/Fowler–Noll–Vo_hash_function
+    const uint8_t *bytes = (uint8_t *)stringToHash.UTF8String;
+    uint64_t hash = 14695981039346656037ULL;
+    for(uint8_t byte = *bytes; byte != '\0'; byte = *(++bytes))
+    {
+        hash ^= byte;
+        hash *= 1099511628211ULL;
+    }
+     return hash;
 }
 
 @end

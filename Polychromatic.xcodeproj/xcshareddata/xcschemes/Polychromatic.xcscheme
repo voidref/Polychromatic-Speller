@@ -41,7 +41,12 @@
       ignoresPersistentStateOnLaunch = "NO"
       debugDocumentVersioning = "YES"
       debugServiceExtension = "internal"
+<<<<<<< HEAD
       allowLocationSimulation = "YES">
+=======
+      allowLocationSimulation = "YES"
+      viewDebuggingEnabled = "No">
+>>>>>>> kolinkrewinkel/master
       <PathRunnable
          runnableDebuggingMode = "0"
          FilePath = "/Applications/Xcode-beta.app">
@@ -51,7 +56,11 @@
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "33B3A3E918CD36BE00AA64C8"
             BuildableName = "Polychromatic.xcplugin"
+<<<<<<< HEAD
             BlueprintName = "PolySpeller"
+=======
+            BlueprintName = "Polychromatic"
+>>>>>>> kolinkrewinkel/master
             ReferencedContainer = "container:Polychromatic.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
