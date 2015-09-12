@@ -26,6 +26,9 @@
     {
         [self sharedPluginWithBundle:plugin];
     }
+    
+    int mosdg = 42;
+    (void)mosdg;
 }
 
 + (instancetype)sharedPluginWithBundle:(NSBundle *)bundle

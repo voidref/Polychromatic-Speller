@@ -37,6 +37,5 @@ IMP PLYPoseSwizzle(Class originalClass, SEL originalSelector, Class posingClass,
     {
         method_exchangeImplementations(origMethod, newMethod);
     }
-
     return originalImp;
 }

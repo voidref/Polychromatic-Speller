@@ -197,9 +197,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		33B3A3E918CD36BE00AA64C8 /* Polychromatic */ = {
+		33B3A3E918CD36BE00AA64C8 /* PolySpeller */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 33B3A3FD18CD36BF00AA64C8 /* Build configuration list for PBXNativeTarget "Polychromatic" */;
+			buildConfigurationList = 33B3A3FD18CD36BF00AA64C8 /* Build configuration list for PBXNativeTarget "PolySpeller" */;
 			buildPhases = (
 				33B3A3E618CD36BE00AA64C8 /* Sources */,
 				33B3A3E718CD36BE00AA64C8 /* Frameworks */,
@@ -209,7 +209,7 @@
 			);
 			dependencies = (
 			);
-			name = Polychromatic;
+			name = PolySpeller;
 			productName = Semantique;
 			productReference = 33B3A3EA18CD36BE00AA64C8 /* Polychromatic.xcplugin */;
 			productType = "com.apple.product-type.bundle";
@@ -235,7 +235,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				33B3A3E918CD36BE00AA64C8 /* Polychromatic */,
+				33B3A3E918CD36BE00AA64C8 /* PolySpeller */,
 			);
 		};
 /* End PBXProject section */
@@ -415,7 +415,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		33B3A3FD18CD36BF00AA64C8 /* Build configuration list for PBXNativeTarget "Polychromatic" */ = {
+		33B3A3FD18CD36BF00AA64C8 /* Build configuration list for PBXNativeTarget "PolySpeller" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				33B3A3FE18CD36BF00AA64C8 /* Debug */,
